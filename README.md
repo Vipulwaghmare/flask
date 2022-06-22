@@ -24,3 +24,5 @@ python main.py
 
 ctrl + c
 deactive : to stop virtual env
+
+https://www.tutorialspoint.com/flask/flask_sessions.htm

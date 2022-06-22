@@ -1,6 +1,23 @@
 from flask import Blueprint, request, Response, jsonify
+# Request:
+# .method => to get method
+# .get_json() => to get request data 
+
+# Response
+# dict => will automatically converted JSON
+# array => use jsonify to convert it to JSON
 
 basicRoutes = Blueprint('basicRoutes', __name__)
+
+@basicRoutes.before_request
+def beforeBasicRequest():
+  print("This is printing Before Basic route request")
+  pass
+
+@basicRoutes.after_request
+def afterBasicRequest(res):
+  print("This is printing after Basic route request")
+  return res
 
 @basicRoutes.route("/get-request")
 def getRequest():
@@ -34,4 +51,4 @@ def deleteRequest():
     request_data = request.get_json()
   except Exception as e:
     return jsonify({"error": "Error getting json out of request"}), 400
-  return { f"your {method} request is" : request_data }
+  return jsonify([{ f"your {method} request is" : request_data }])
