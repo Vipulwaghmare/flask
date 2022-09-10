@@ -1,7 +1,8 @@
+from sys import prefix
 from flask import Flask 
-from routes.htmlTemplate import htmlTemplate
-from routes.basicRoutes import basicRoutes
-from routes.authRoutes import authRoutes
+from routes.html import htmlTemplate
+from routes.basic import basicRoutes
+from routes.auth import authRoutes
 
 from flask_session import Session
 
@@ -38,7 +39,7 @@ def index():
 # Creating routes in different folder because we don't need to cluster here
 app.register_blueprint(htmlTemplate)
 app.register_blueprint(basicRoutes)
-app.register_blueprint(authRoutes)
+app.register_blueprint(authRoutes, url_prefix="/api/v1/")
 
 
 if __name__ == "__main__":
