@@ -1,0 +1,18 @@
+{
+  "mailer": {
+    "host": "",
+    "port": 8080,
+    "username": "",
+    "password": "",
+    "from_address": "info@vipul.waghmare",
+    "to_address": ["vipul@gmail.com", "waghmare@gmail.com"]
+  },
+  "path": {
+    "path": "/logs",
+    "file_name": "cloudwatch"
+  },
+  "slack": {
+    "channel_token": "xyz",
+    "channel_name": "abc"
+  }
+}
