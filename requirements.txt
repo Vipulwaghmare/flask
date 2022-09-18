@@ -11,3 +11,4 @@ pycurl==7.43.0.5
 slacker-log-handler==1.7.1
 watchtower==1.0.0
 twilio==6.62.1
+openpyxl==3.0.10

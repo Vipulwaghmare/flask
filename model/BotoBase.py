@@ -6,7 +6,7 @@ class BotoBase:
     self.load_config_base()
 
   def load_config_base(self):
-    with open('settings/boto_base_config.json') as config_file:
+    with open('settings/boto_config.json') as config_file:
       config_data = json.load(config_file)
       self._aws_access_key_id = config_data['aws_access_key_id']
       self._aws_secret_access_key = config_data["aws_secret_access_key"]
