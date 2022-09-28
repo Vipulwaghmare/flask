@@ -1,14 +1,14 @@
-from dataclasses import dataclass
+from flask import g 
 import mysql.connector
 import json
 from settings.environment import config_folder
 
 class MySQL:
-  def __init__(self, database_name, config_file_name = "db", **opts):
+  def __init__(self, database_name = "test", config_file_name = "db", **opts):
     self.connection = None
     self._database = database_name
-    self.load_config(config_file_name)
-    self.create_connection(opts)
+    self.load_config(config_file_name) 
+    self.create_connection(opts) 
 
   def load_config(self, config_file_name):
     # config_folder not available in global variables
@@ -37,9 +37,5 @@ class MySQL:
     return self.connection
   
   def close(self):
-    self.connection.close()
-
-class BaseWithDB:
-  def __init__(self):
-    self._table_name = None
-  
+    if self.connection is not None:
+      self.connection.close()
