@@ -1,10 +1,10 @@
-import functools
+from functools import wraps
 from jsonschema import  validate
 from flask import jsonify, request, json
 import os
 
 def validate_request_body(route):
-    @functools.wraps(route)
+    @wraps(route)
     def wrapper(*args, **kwargs):
         if "Content-Type" not in request.headers:
             return jsonify({ "error": "Content-Type header is not set"}),400
@@ -18,9 +18,9 @@ def validate_request_body(route):
     return wrapper
 
 def validate_request_properties(properties):
-    @functools.wraps(properties)
+    @wraps(properties)
     def decorator(function):
-        @functools.wraps(function)
+        @wraps(function)
         def wrapper(*args, **kwargs):
             try:
                 request_data = request.get_json()
@@ -40,9 +40,9 @@ def validate_request_properties(properties):
     return decorator
 
 def validate_request_schema(schema_file_path):
-    @functools.wraps(schema_file_path)
+    @wraps(schema_file_path)
     def decorator(function):
-        @functools.wraps(function)
+        @wraps(function)
         def wrapper(*args, **kwargs):
             try:
                 request_data = request.get_json()

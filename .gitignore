@@ -1,4 +1,6 @@
 env
+settings
+logs
 flask_session
 *.pyc
 .env

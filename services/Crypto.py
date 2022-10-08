@@ -2,6 +2,7 @@ import json
 import secrets
 import bcrypt
 import re
+import jwt
 
 class Crypto:
   def __init__(self):
@@ -15,7 +16,7 @@ class Crypto:
     self._lifespan = config_data["lifespan"] # hours
   
   def hash_password(self, password):
-    salt = bcrypt.gensalt(rounds=6)
+    salt = bcrypt.gensalt(rounds=10)
     hashed_password = bcrypt.hashpw(password.encode('utf8'), salt)
     return hashed_password
 
@@ -36,21 +37,6 @@ class Crypto:
       return True
     else:
       return False
-
-  # def check_password_requirements(self, pwd):
-  #   results = {
-  #     "Password should include at least 1 lower case character": False,
-  #     "Password should Include at least one number": False,
-  #     "Password should between 7 and 32 characters long": False
-  #   }
-  #   password_validation_errors = []
-  #   if len(pwd) not in range(7, 32):
-  #     results["Password should between 7 and 32 characters long"] = True
-  #   if not bool(re.search(r'\d', pwd)):
-  #     results["Password should Include at least one number"] = True
-  #   if not bool(re.search(r'[a-z]', pwd)):
-  #     results["Password should include at least 1 lower case character"] = True
-  #   return results
   
   def check_password_requirements(self, pwd):
     password_validation_errors = []
@@ -61,3 +47,17 @@ class Crypto:
     if not bool(re.search(r'[a-z]', pwd)):
       password_validation_errors.append("Password should include at least 1 lower case character")
     return password_validation_errors
+  
+  def encode(self, payload):
+    if not type(payload) is dict:
+      raise Exception("Payload type is invalid")
+    encoded_jwt = jwt.encode(payload, self._secret, algorithm = self._algorithm)
+    return encoded_jwt.decode('ascii') #url safe string
+
+  def decode(self, hash_string):
+    hash_string = hash_string.encode('ascii')
+    try:
+      payload = jwt.decode(hash_string, self._secret, algorithms = self._algorithm)
+    except Exception as e:
+      raise e
+    return payload

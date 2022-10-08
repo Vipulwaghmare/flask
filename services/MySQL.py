@@ -7,8 +7,8 @@ class MySQL:
   def __init__(self, database_name = "test", config_file_name = "db", **opts):
     self.connection = None
     self._database = database_name
-    self.load_config(config_file_name) 
-    self.create_connection(opts) 
+    self.load_config(config_file_name)
+    self.set_db_connection(opts)
 
   def load_config(self, config_file_name):
     # config_folder not available in global variables
@@ -20,16 +20,25 @@ class MySQL:
       self._host = config_data["host"]
       self._user = config_data["user_name"]
       self._password = config_data["password"]
+  
+  def set_db_connection(self, opts): 
+    if 'db' not in g: 
+      g.db = self.create_connection(opts) 
+    else:
+      self.connection = g.db
+    return g.db
 
-  def create_connection(self, opts):
+  def create_connection(self, opts): 
+    print("Creating new connection...")
     self.connection = mysql.connector.connect(
       host = self._host,
       database = self._database,
       user = self._user,
       password = self._password,
       **opts
-    )
+    ) 
     self.connection = self.get_connection()
+    return self.connection
   
   def get_connection(self):
     if not self.connection.is_connected():
