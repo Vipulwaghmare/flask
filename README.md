@@ -26,3 +26,11 @@ ctrl + c
 deactive : to stop virtual env
 
 https://www.tutorialspoint.com/flask/flask_sessions.htm
+
+<!-- DAO -->
+
+For mysql : Use dao directory
+
+<!-- Model -->
+
+For mongoDB : Use Model directory

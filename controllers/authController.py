@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta, timezone
 from flask import request, jsonify
-from services.Crypto import Crypto
 from services.User import User
 from utils.requestValidation import  validate_request_body, validate_request_properties, validate_request_schema
 from model.Logger import Logger
@@ -49,11 +47,52 @@ def login():
     if not valid:
       return jsonify({ "error" : "Invalid Email or Password" }), 401
 
+    user_details = {
+      "name": user_details["name"],
+      "email": user_details["email"]
+    }
     access_token = user.get_access_token(user_details)
     refresh_token = user.get_refresh_token(user_details)
     user.update_refresh_token(email, refresh_token)
 
     return { "success": "Logged in successfully", "access_token": access_token, "refresh_token": refresh_token }
+
+  except Exception as e:
+    return jsonify({"error": "Some error occured and figure it out" }), 400
+
+def getAccessToken():
+  try: 
+    refresh_token = request.args.get('refresh_token')
+
+    if refresh_token is None:
+      return { "error" : "refresh_token missing in query" }
+
+    user = User()
+    user_details = user.validate_access_token(refresh_token)
+    
+    if user_details is None:
+      return jsonify({ "error" : "Invalid Access token" }), 401
+    
+    if "email" not in user_details:
+      return jsonify({ "error" : "Invalid Access token" }), 401
+
+    db_user_details = user.get_user_details(user_details["email"])
+
+    if not db_user_details:
+      return jsonify({ "error" : "Invalid access token" }), 401
+    
+    if db_user_details["refresh_token"] != refresh_token:
+      return jsonify({ "error" : "Invalid Access token" }), 401
+
+    user_details = {
+      "name": user_details["name"],
+      "email": user_details["email"]
+    }
+    access_token = user.get_access_token(user_details)
+    refresh_token = user.get_refresh_token(user_details)
+    user.update_refresh_token(user_details["email"], refresh_token)
+
+    return { "access_token": access_token, "refresh_token": refresh_token }
 
   except Exception as e:
     return jsonify({"error": "Some error occured and figure it out" }), 400
@@ -80,7 +119,7 @@ def requestPasswordReset():
 
     user = User()
     # saves token hash in db & returns token for user
-    token = user.update_password_reset_token(email)
+    token = user.generate_password_reset_token(email)
 
     # ! Send email and remove token from response 
     return { "token" : token }  

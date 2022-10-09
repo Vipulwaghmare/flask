@@ -1,4 +1,7 @@
 # To add in mysql query : [a,b,c] => (a, b, c)
+import json
+from bson import json_util
+
 def list_to_tuple(li):
   if (type(li) != list):
     raise TypeError("Invalid List Provided")
@@ -11,3 +14,6 @@ class Wrapper_For_Read():
     self.blob = blob
   def read(self, *args):
     return self.blob
+  
+def bson_to_json(data):
+  return json.loads(json_util.dumps(data))
