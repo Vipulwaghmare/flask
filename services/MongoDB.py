@@ -29,13 +29,22 @@ class MongoDB:
     if self.connection is not None:
       self.connection.close()
   
-  def find_one(self, condition = {} ):
-    data = self.collection.find_one(condition)
+  def find_one(self, condition = {}, select = {} ):
+    data = self.collection.find_one(condition, select)
     return bson_to_json(data)
 
   def insert_one(self, insert_data):
     try:
       self.collection.insert_one(insert_data)
+      return { "success": "Successfully inserted data" }
+    except errors.DuplicateKeyError as de:
+      return { "error" : "Duplicate entry found" }
+    except Exception as e:
+      return { "error": "Some error occured" }
+
+  def update_one(self, filter_data, updated_values):
+    try:
+      self.collection.update_one(filter_data, updated_values)
       return { "success": "Successfully inserted data" }
     except errors.DuplicateKeyError as de:
       return { "error" : "Duplicate entry found" }
