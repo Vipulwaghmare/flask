@@ -11,21 +11,26 @@ logger = Logger.get_instance()
 def register():
   try:
     request_data = request.json
-    (email, password) = (request_data["email"], request_data["password"])
+    
+    try:
+      user = User()
+      user_data = user.get_user_register_data(request_data)
+    except Exception as e:
+      return jsonify({ "error" : "Missing user data in request" }), 401
 
-    user = User()
-    user_found = user.get_user_details(email)
+    user_found = user.get_user_details(user_data['email'])
     
     if user_found is not None:
       return jsonify({ "error" : "User already exists" }), 401
 
-    response = user.register_user(email, password)
+    response = user.register_user(user_data)
 
     if "error" in response:
       return jsonify({ "error" : response["error"] }), 401
 
-    return jsonify({ "success": f"Successfully created user with Email: {email}" })
+    return jsonify({ "success": f"Successfully created user with Email: {user_data['email']}" })
   except Exception as e:
+    logger.log.error(f"[Register] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400
 
 @validate_request_body
@@ -48,16 +53,17 @@ def login():
       return jsonify({ "error" : "Invalid Email or Password" }), 401
 
     user_details = {
-      "name": user_details["name"],
       "email": user_details["email"]
     }
-    access_token = user.get_access_token(user_details)
-    refresh_token = user.get_refresh_token(user_details)
-    user.update_refresh_token(email, refresh_token)
 
-    return { "success": "Logged in successfully", "access_token": access_token, "refresh_token": refresh_token }
+    response = user.get_login_response(user_details)
+    if "error" in response:
+      return jsonify({ "error" : response["error"] }), 401
+
+    return { "success": "Logged in successfully", "data": response }
 
   except Exception as e:
+    logger.log.error(f"[Login] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400
 
 def getAccessToken():
@@ -95,6 +101,7 @@ def getAccessToken():
     return { "access_token": access_token, "refresh_token": refresh_token }
 
   except Exception as e:
+    logger.log.error(f"[getAccessToken] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400
 
 def logout():
@@ -108,6 +115,7 @@ def logout():
 
     return f"User logged out successfully"
   except Exception as e:
+    logger.log.error(f"[logout] {str(e)}")
     return jsonify({"error": "Error getting json out of request"}), 400
 
 @validate_request_body
@@ -125,6 +133,7 @@ def requestPasswordReset():
     return { "token" : token }  
     # return { "Success": "Email sent. Please check and validate" }
   except Exception as e:
+    logger.log.error(f"[requestPasswordReset] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400
 
 @validate_request_body
@@ -146,7 +155,7 @@ def validatePasswordResetToken():
 
     return jsonify({"status": "Invalid token"}), 412
   except Exception as e: 
-    print("E", e)
+    logger.log.error(f"[validatePasswordResetToken] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400
 
 @validate_request_body
@@ -171,4 +180,5 @@ def resetPassword():
       
     return { 'status': "Password set successfully" }
   except Exception as e:
+    logger.log.error(f"[resetPassword] {str(e)}")
     return jsonify({"error": "Some error occured and figure it out" }), 400

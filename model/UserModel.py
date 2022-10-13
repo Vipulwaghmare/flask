@@ -9,7 +9,9 @@ class UserModel(MongoDB):
   def get_user_details(self, email):
     return self.find_one({ "email": email } )
   
-  def register_user(self, email, password):
+  def save_user(self, user_data):
+    email = user_data['email']
+    password = user_data['password']
     response = self.insert_one({
       "email": email,
       "password": password

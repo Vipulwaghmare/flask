@@ -14,21 +14,24 @@ class MongoDB:
   def set_db_connection(self,):
     db = getattr(g, 'db', None)
     if db is None:
-      db = g.db = self.create_connection()
-    return db
+      self.create_connection()
+    else:
+      self.db = db
 
   def create_connection(self):
     try:
       self.connection = MongoClient('mongodb://localhost:27017/')
+      g.db = self.connection
       self.db = self.connection[self._database]
-      # test = self.connection.server_info()
     except Exception as e:
       print("ERROR - Cannot connect to db")
 
   def close(self):
+    print('closing-connection')
     if self.connection is not None:
       self.connection.close()
   
+  # CRUD Queries
   def find_one(self, condition = {}, select = {} ):
     data = self.collection.find_one(condition, select)
     return bson_to_json(data)

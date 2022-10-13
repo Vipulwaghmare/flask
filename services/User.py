@@ -1,8 +1,12 @@
 from datetime import datetime, timedelta, timezone
-from dao.UserDao import UserDao 
+from dao.UserDao import UserDao
+from model.UserModel import UserModel 
 from services.Crypto import Crypto
+from model.Logger import Logger
 
-class User(UserDao):
+logger = Logger.get_instance() 
+
+class User(UserModel):
   def __init__(self):
     super(User, self).__init__()
   
@@ -17,6 +21,23 @@ class User(UserDao):
     decoded_hash_password = str(hashed_password.decode('utf8'))
     
     return { "hash_password": decoded_hash_password }
+
+  def register_user(self, user_data):
+    hash_password = self.set_password(user_data['password'])
+    if "error" in hash_password:
+      return { "error": hash_password["error"] }
+    user_data['password'] = hash_password["hash_password"]
+    try:
+      return self.save_user(user_data)
+    except Exception as e:
+      return { "error": 'Failed to add user' }
+
+  def get_user_register_data(self, request_data):
+    # validate schema 
+    return {
+      "email": request_data["email"],
+      "password": request_data["password"]
+    }
 
   def validate_password(self, password, bytes_hashed_password):
     bytes_hashed_password = bytes_hashed_password.encode('utf8')
@@ -35,6 +56,17 @@ class User(UserDao):
     payload['exp'] =  datetime.now(tz=timezone.utc) + timedelta(days=1)
     refresh_token = crypto.encode(payload)
     return refresh_token
+  
+  def get_login_response(self, user_details):
+    try:
+      email = user_details["email"]
+      access_token = self.get_access_token(user_details)
+      refresh_token = self.get_refresh_token(user_details)
+      self.update_refresh_token(email, refresh_token)
+      return { "access_token": access_token, "refresh_token": refresh_token, "email": email } 
+    except Exception as e:
+      logger.log.error(f"[get_login_response] {str(e)}")
+      return {"error": "Some Error occured." }
 
   def generate_password_reset_token(self, email):
     # generate token 

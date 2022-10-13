@@ -13,19 +13,14 @@ class UserDao(MySQL):
     user = cursor.fetchone()
     return user
 
-  def register_user(self, email, password):
-    hash_password = self.set_password(password)
-    if "error" in hash_password:
-      return { "error": hash_password["error"] }
-    hash_password = hash_password["hash_password"]
-    try:
-      query = ("INSERT INTO user ( email, password)  VALUES (%s , %s ) ") 
-      cursor = self.connection.cursor() 
-      cursor.execute(query, (email, hash_password,))
-      self.connection.commit()
-      return { "Success": "Successfully created user" }
-    except Exception as e:
-      return { "error": "Some error occurred" }
+  def save_user(self, user_data):
+    email = user_data['email']
+    password = user_data['password']
+    query = ("INSERT INTO user ( email, password)  VALUES (%s , %s ) ") 
+    cursor = self.connection.cursor() 
+    cursor.execute(query, (email, password,))
+    self.connection.commit()
+    return { "Success": "Successfully created user" }
 
   def get_password_reset_token(self, email):
     cursor = self.connection.cursor(dictionary=True)
