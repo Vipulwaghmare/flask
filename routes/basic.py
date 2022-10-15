@@ -1,7 +1,7 @@
-from flask import Blueprint, request, Response, jsonify
+from flask import Blueprint, request, jsonify 
 # Request:
 # .method => to get method
-# .get_json() => to get request data 
+# .json => to get request data 
 
 # Response
 # dict => will automatically converted JSON
@@ -26,7 +26,7 @@ def getRequest():
 @basicRoutes.route("/post-request", methods=['POST'])
 def postRequest():
   try:
-    request_data = request.get_json()
+    return request.json
   except Exception as e:
     return jsonify({"error": "Error getting json out of request"}), 400
   
@@ -39,7 +39,7 @@ def postRequest():
 @basicRoutes.route("/put-request", methods=['PUT'])
 def putRequest():
   try:
-    request_data = request.get_json()
+    request_data = request.json
   except Exception as e:
     return jsonify({"error": "Error getting json out of request"}), 400
   return { "your put request is" : request_data }
@@ -48,7 +48,25 @@ def putRequest():
 def deleteRequest():
   try:
     method = request.method
-    request_data = request.get_json()
+    request_data = request.json
   except Exception as e:
     return jsonify({"error": "Error getting json out of request"}), 400
   return jsonify([{ f"your {method} request is" : request_data }])
+
+@basicRoutes.route('/form-data', methods =["POST"])
+def gfg():
+  first_name = request.form.get("fname")
+  last_name = request.form.get("lname") 
+  # check if the post request has the file part
+  if 'file' not in request.files:
+    return { 'error': "no file found" }
+  file = request.files['file']
+  # If the user does not select a file, the browser submits an
+  # empty file without a filename.
+  if file.filename == '':
+    return { 'error': 'file has no name :(' } 
+  filename = file.filename
+  if file:
+    file.save(filename)
+    return { 'success': 'downloaded file successfully' } 
+  return { 'success': 'somehow execution ended' } 

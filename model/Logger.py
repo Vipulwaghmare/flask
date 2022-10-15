@@ -3,9 +3,9 @@ from logging.handlers import SMTPHandler, RotatingFileHandler
 import json
 import os
 # Logs in Slack
-from slacker_log_handler import SlackerLogHandler
+# from slacker_log_handler import SlackerLogHandler
 # Logs in AWS CloudWatch
-import watchtower
+# import watchtower
 
 '''
 Usage:
@@ -54,28 +54,33 @@ class Logger:
     fh.setLevel(logging.DEBUG)
 
     # Logging to cloudwatch
-    if logger_env != "LOCAL":
-      log_group = logger_env + "_Backend_Apis"
-      cwh = watchtower.CloudWatchLogHandler(log_group = log_group)
-      logger.addHandler(cwh)
+    # if logger_env != "LOCAL":
+    #   log_group = logger_env + "_Backend_Apis"
+    #   cwh = watchtower.CloudWatchLogHandler(log_group = log_group)
+    #   logger.addHandler(cwh)
     
     # Email 
-    if logger_env == "PROD":
-      eh = SMTPHandler(self._host, self._from_address, self._to_address, "# Backend Error #", (self._username, self._password), (), timeout=1.0)
-      eh.setLevel(logging.ERROR)
-      eh.setFormatter(formatter)
-      logger.addHandler(eh)
+    # if logger_env == "PROD":
+    #   eh = SMTPHandler(self._host, self._from_address, self._to_address, "# Backend Error #", (self._username, self._password), (), timeout=1.0)
+    #   eh.setLevel(logging.ERROR)
+    #   eh.setFormatter(formatter)
+    #   logger.addHandler(eh)
     
     # Errors on Slack
-    if logger_env == "PROD":
-      try:
-        sh = SlackerLogHandler(self._channel_token, self._channel_name, stack_trace=True)
-        sh.setLevel(logging.ERROR)
-        sh.setFormatter(formatter)
-        logger.addHandler(sh)
-      except Exception as e:
-        print(e)
-        raise e
+    # if logger_env == "PROD":
+    #   try:
+    #     sh = SlackerLogHandler(self._channel_token, self._channel_name, stack_trace=True)
+    #     sh.setLevel(logging.ERROR)
+    #     sh.setFormatter(formatter)
+    #     logger.addHandler(sh)
+    #   except Exception as e:
+    #     print(e)
+    #     raise e
+
+    # Printing in terminal
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(formatter)
+    logger.addHandler(consoleHandler)
     
     # Creating Formatter and Adding to the handler
     fh.setFormatter(formatter)

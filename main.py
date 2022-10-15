@@ -1,10 +1,15 @@
-from sys import prefix
-from flask import Flask 
+from flask import Flask, g
+from model.Email import Email 
 from routes.html import htmlTemplate
 from routes.basic import basicRoutes
 from routes.auth import authRoutes
+from routes.test import testRoutes
 
 from flask_session import Session
+
+from model.Logger import Logger
+
+logger = Logger.get_instance() 
 
 app = Flask(__name__)
 
@@ -39,8 +44,17 @@ def index():
 # Creating routes in different folder because we don't need to cluster here
 app.register_blueprint(htmlTemplate)
 app.register_blueprint(basicRoutes)
+app.register_blueprint(testRoutes)
 app.register_blueprint(authRoutes, url_prefix="/api/v1/")
 
+@app.teardown_appcontext
+def teardown(self):
+  db = g.pop('db', None)
+  try:
+    if db is not None:
+      db.close()
+  except Exception as e:
+    logger.log.error(f"[Login] {str(e)}")
 
 if __name__ == "__main__":
   app.run(port=1000, debug=True)
