@@ -52,3 +52,8 @@ def deleteRequest():
   except Exception as e:
     return jsonify({"error": "Error getting json out of request"}), 400
   return jsonify([{ f"your {method} request is" : request_data }])
+
+@basicRoutes.route("/error-request")
+def errorRequest():
+  raise Exception("This is error route")
+  return { "message": "This is Error request" }
