@@ -1,5 +1,4 @@
 from flask import Flask, g
-from model.Email import Email 
 from routes.html import htmlTemplate
 from routes.basic import basicRoutes
 from routes.auth import authRoutes
@@ -41,6 +40,7 @@ def afterRequest(res):
 def index():
   return "Hello, World!"
 
+
 # Creating routes in different folder because we don't need to cluster here
 app.register_blueprint(htmlTemplate)
 app.register_blueprint(basicRoutes)
@@ -55,8 +55,21 @@ def teardown(self):
       db.close()
   except Exception as e:
     logger.log.error(f"[Login] {str(e)}")
+    
+@app.errorhandler(404)
+def page_not_found(error):
+  return {
+    "error": "You are lost dude!"
+  }, 404
 
+@app.errorhandler(Exception)
+def exception_handler(error):
+  return {
+    "error": "We have failed you. Apologies. :("
+  }, 500
+
+app.debug = True
 if __name__ == "__main__":
-  app.run(port=1000, debug=True)
+  app.run(port=1000)
   # debug = True ==> Starts in development mode, restarts server when changes happen
   # port = 1000 ==> Starts on port : 1000 , default port is 5000

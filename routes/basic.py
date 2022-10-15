@@ -70,3 +70,8 @@ def gfg():
     file.save(filename)
     return { 'success': 'downloaded file successfully' } 
   return { 'success': 'somehow execution ended' } 
+  
+@basicRoutes.route("/error-request")
+def errorRequest():
+  raise Exception("This is error route")
+  return { "message": "This is Error request" }
