@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify 
+from flask import Blueprint, request 
 # Request:
 # .method => to get method
 # .json => to get request data 
@@ -19,59 +19,58 @@ def afterBasicRequest(res):
   print("This is printing after Basic route request")
   return res
 
-@basicRoutes.route("/get-request")
+@basicRoutes.route("/get")
 def getRequest():
   return { "message": "This is GET request" }
 
-@basicRoutes.route("/post-request", methods=['POST'])
+@basicRoutes.route("/post", methods=['POST'])
 def postRequest():
-  try:
-    return request.json
-  except Exception as e:
-    return jsonify({"error": "Error getting json out of request"}), 400
-  
-  if "send_facts" in request_data:
-    if request_data['send_facts']:
-      return  "Taarak Mehta Ka oolta chashma is the worst show ever" 
-    return "You don't need any facts"
-  return { "your request is" : request_data }
+  # return { "success" : "This is default 200" }
+  # raise Exception("HI")
+  # return {"error": "This is throwing some error"}, 400
+  return [1,2,3,4,5] 
 
 @basicRoutes.route("/put-request", methods=['PUT'])
 def putRequest():
   try:
     request_data = request.json
   except Exception as e:
-    return jsonify({"error": "Error getting json out of request"}), 400
+    return {"error": "Error getting json out of request"}, 400
   return { "your put request is" : request_data }
 
-@basicRoutes.route("/delete-request", methods=['DELETE', "POST"])
+@basicRoutes.route("/delete-put-request", methods=['DELETE', "PUT"])
 def deleteRequest():
-  try:
-    method = request.method
-    request_data = request.json
-  except Exception as e:
-    return jsonify({"error": "Error getting json out of request"}), 400
-  return jsonify([{ f"your {method} request is" : request_data }])
+  method = request.method
+  if method == "PUT":
+    return { "Success": "You sent a PUT request" }
+  if method == "DELETE":
+    return { "Success": "You sent a DELETE request" }
+  return f"This is method: {method}"
 
 @basicRoutes.route('/form-data', methods =["POST"])
-def gfg():
-  first_name = request.form.get("fname")
-  last_name = request.form.get("lname") 
+def formData():
+  name = request.form.get("name") 
   # check if the post request has the file part
   if 'file' not in request.files:
-    return { 'error': "no file found" }
+    return { 'error': "no file found" }, 400
   file = request.files['file']
-  # If the user does not select a file, the browser submits an
-  # empty file without a filename.
   if file.filename == '':
-    return { 'error': 'file has no name :(' } 
+    return { 'error': 'file has no name :(' } , 400
   filename = file.filename
   if file:
     file.save(filename)
-    return { 'success': 'downloaded file successfully' } 
-  return { 'success': 'somehow execution ended' } 
+    return { 'success': 'downloaded file successfully' }
   
-@basicRoutes.route("/error-request")
-def errorRequest():
-  raise Exception("This is error route")
-  return { "message": "This is Error request" }
+@basicRoutes.route('/query-request')
+def queryRequest():
+  name = request.args.get("name")
+  profession = request.args.get("profession")
+  print("ARGS", request.args)
+  return {
+    "name": name,
+    "profession": profession
+  }
+
+@basicRoutes.route('/search/<name>')
+def my_view_func(name):
+  return { "Success": f"You searched for {name}"}

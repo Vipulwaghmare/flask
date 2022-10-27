@@ -1,22 +1,9 @@
-from flask import Flask, g
+from sys import prefix
+from flask import Flask
 from routes.html import htmlTemplate
 from routes.basic import basicRoutes
-from routes.auth import authRoutes
-from routes.test import testRoutes
-
-from flask_session import Session
-
-from model.Logger import Logger
-
-logger = Logger.get_instance() 
 
 app = Flask(__name__)
-
-# secret key and type to use session
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SECRET_KEY'] = 'super secret key'
-
-Session(app)
 
 @app.before_request
 def beforeRequest():
@@ -24,7 +11,6 @@ def beforeRequest():
   # ? Can be used for * #
   # ? Opening database connections.
   # ? tracking user actions
-  # ? adding a “back button” feature by remembering the last page the user visited before loading the next
   # ? determining user permissions, etc……
   pass
 
@@ -40,36 +26,32 @@ def afterRequest(res):
 def index():
   return "Hello, World!"
 
+@app.route("/", methods=['POST'] )
+def postIndex():
+  return "This is post request"
 
 # Creating routes in different folder because we don't need to cluster here
-app.register_blueprint(htmlTemplate)
-app.register_blueprint(basicRoutes)
-app.register_blueprint(testRoutes)
-app.register_blueprint(authRoutes, url_prefix="/api/v1/")
+app.register_blueprint(htmlTemplate, url_prefix="/api/v1/")
+app.register_blueprint(basicRoutes, url_prefix="/api/v1/")
 
 @app.teardown_appcontext
 def teardown(self):
-  db = g.pop('db', None)
-  try:
-    if db is not None:
-      db.close()
-  except Exception as e:
-    logger.log.error(f"[Login] {str(e)}")
+  print("Ending app context")
     
 @app.errorhandler(404)
 def page_not_found(error):
   return {
-    "error": "You are lost dude!"
+    "error": "Oops! This page doesn't exist."
   }, 404
 
 @app.errorhandler(Exception)
 def exception_handler(error):
   return {
-    "error": "We have failed you. Apologies. :("
+    "error": "This is error caught in Error Handler"
   }, 500
 
 app.debug = True
 if __name__ == "__main__":
-  app.run(port=1000)
+  app.run(port=1000, debug = True)
   # debug = True ==> Starts in development mode, restarts server when changes happen
-  # port = 1000 ==> Starts on port : 1000 , default port is 5000
+  # port = 5000 ==> Starts on port : 5000 , default port is 5000

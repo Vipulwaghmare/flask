@@ -3,8 +3,7 @@ from flask import Blueprint, render_template
 htmlTemplate = Blueprint('htmlTemplate', __name__)
 
 @htmlTemplate.route("/basic-html")
-def basicHTML():
-  # To return html template: it automatically picks from templates folder 
+def basicHTML(): 
   return render_template("basic.html")
 
 @htmlTemplate.route("/jinja-html")

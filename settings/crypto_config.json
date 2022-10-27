@@ -1,5 +1,0 @@
-{
-  "secret": "somesecretwhichshouldnotbeshared",
-  "algorithm": "HS256",
-  "lifespan": 48
-}

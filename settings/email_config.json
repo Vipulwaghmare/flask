@@ -1,8 +1,0 @@
-{
-  "smtp_host": "",
-  "sender": "info@vipul.waghmare",
-  "user_name": "vipul-waghmare",
-  "password": "password",
-  "qa_email": "qa@vipul.waghmare",
-  "white_list": ["google.com", "maybe.com", "test.com"]
-}
