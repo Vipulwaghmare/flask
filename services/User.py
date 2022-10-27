@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from dao.UserDao import UserDao
 from model.UserModel import UserModel 
 from services.Crypto import Crypto
-from model.Logger import Logger
+from services.Logger import Logger
 
 logger = Logger.get_instance() 
 

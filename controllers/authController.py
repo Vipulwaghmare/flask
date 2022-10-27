@@ -1,7 +1,7 @@
-from flask import request, jsonify
+from flask import request
 from services.User import User
 from utils.requestValidation import  validate_request_body, validate_request_properties, validate_request_schema
-from model.Logger import Logger
+from services.Logger import Logger
 
 logger = Logger.get_instance() 
 
@@ -16,22 +16,22 @@ def register():
       user = User()
       user_data = user.get_user_register_data(request_data)
     except Exception as e:
-      return jsonify({ "error" : "Missing user data in request" }), 401
+      return { "error" : "Missing user data in request" }, 401
 
     user_found = user.get_user_details(user_data['email'])
     
     if user_found is not None:
-      return jsonify({ "error" : "User already exists" }), 401
+      return { "error" : "User already exists" }, 401
 
     response = user.register_user(user_data)
 
     if "error" in response:
-      return jsonify({ "error" : response["error"] }), 401
+      return { "error" : response["error"] }, 401
 
-    return jsonify({ "success": f"Successfully created user with Email: {user_data['email']}" })
+    return { "success": f"Successfully created user with Email: {user_data['email']}" }
   except Exception as e:
     logger.log.error(f"[Register] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400
 
 @validate_request_body
 @validate_request_properties(['email', 'password'])
@@ -45,12 +45,12 @@ def login():
     user_details = user.get_user_details(email)
     
     if user_details is None:
-      return jsonify({ "error" : "User not found" }), 401
+      return { "error" : "User not found" }, 401
 
     valid = user.validate_password(password, user_details["password"])
     
     if not valid:
-      return jsonify({ "error" : "Invalid Email or Password" }), 401
+      return { "error" : "Invalid Email or Password" }, 401
 
     user_details = {
       "email": user_details["email"]
@@ -58,13 +58,13 @@ def login():
 
     response = user.get_login_response(user_details)
     if "error" in response:
-      return jsonify({ "error" : response["error"] }), 401
+      return { "error" : response["error"] }, 401
 
     return { "success": "Logged in successfully", "data": response }
 
   except Exception as e:
     logger.log.error(f"[Login] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400
 
 def getAccessToken():
   try: 
@@ -77,18 +77,18 @@ def getAccessToken():
     user_details = user.validate_access_token(refresh_token)
     
     if user_details is None:
-      return jsonify({ "error" : "Invalid Access token" }), 401
+      return { "error" : "Invalid Access token" }, 401
     
     if "email" not in user_details:
-      return jsonify({ "error" : "Invalid Access token" }), 401
+      return { "error" : "Invalid Access token" }, 401
 
     db_user_details = user.get_user_details(user_details["email"])
 
     if not db_user_details:
-      return jsonify({ "error" : "Invalid access token" }), 401
+      return { "error" : "Invalid access token" }, 401
     
     if db_user_details["refresh_token"] != refresh_token:
-      return jsonify({ "error" : "Invalid Access token" }), 401
+      return { "error" : "Invalid Access token" }, 401
 
     user_details = {
       "name": user_details["name"],
@@ -102,7 +102,7 @@ def getAccessToken():
 
   except Exception as e:
     logger.log.error(f"[getAccessToken] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400
 
 def logout():
   try:
@@ -116,7 +116,7 @@ def logout():
     return f"User logged out successfully"
   except Exception as e:
     logger.log.error(f"[logout] {str(e)}")
-    return jsonify({"error": "Error getting json out of request"}), 400
+    return {"error": "Error getting json out of request"}, 400
 
 @validate_request_body
 @validate_request_properties(['email'])
@@ -134,7 +134,7 @@ def requestPasswordReset():
     # return { "Success": "Email sent. Please check and validate" }
   except Exception as e:
     logger.log.error(f"[requestPasswordReset] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400
 
 @validate_request_body
 @validate_request_properties(['email', 'token'])
@@ -148,15 +148,15 @@ def validatePasswordResetToken():
     valid = user.validate_password_reset_token(email, token)
 
     if "error" in valid:
-      return jsonify({"status": "Invalid token"}), 412
+      return {"status": "Invalid token"}, 412
 
     if valid:
-      return jsonify({"status": "Ready for new password"}), 200
+      return {"status": "Ready for new password"}, 200
 
-    return jsonify({"status": "Invalid token"}), 412
+    return {"status": "Invalid token"}, 412
   except Exception as e: 
     logger.log.error(f"[validatePasswordResetToken] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400
 
 @validate_request_body
 @validate_request_properties(['password', 'email', 'token'])
@@ -171,14 +171,14 @@ def resetPassword():
     valid = user.validate_password_reset_token(email, token)
 
     if "error" in valid:
-      return jsonify({"status": "Invalid token"}), 412
+      return {"status": "Invalid token"}, 412
 
     response = user.update_password(email, password)
 
     if "error" in response:
-      return jsonify({"password_validation_error": response["error"] }), 415
+      return {"password_validation_error": response["error"] }, 415
       
     return { 'status': "Password set successfully" }
   except Exception as e:
     logger.log.error(f"[resetPassword] {str(e)}")
-    return jsonify({"error": "Some error occured and figure it out" }), 400
+    return {"error": "Some error occured and figure it out" }, 400

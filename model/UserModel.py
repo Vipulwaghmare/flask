@@ -1,4 +1,3 @@
-import json
 from services.MongoDB import MongoDB
 
 class UserModel(MongoDB):

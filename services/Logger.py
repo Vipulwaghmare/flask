@@ -2,14 +2,10 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import json
 import os
-# Logs in Slack
-# from slacker_log_handler import SlackerLogHandler
-# Logs in AWS CloudWatch
-# import watchtower
 
 '''
 Usage:
-from model.Logger import Logger
+from services.Logger import Logger
 logger = Logger.get_instance()
   logger.log.info('Info log')
   logger.log.error("Error Log")
@@ -52,30 +48,6 @@ class Logger:
     # File handler which logs debug messages
     fh = RotatingFileHandler('logs/{}.log'.format(self._file_name), maxBytes=100*1024*1024, backupCount=100)
     fh.setLevel(logging.DEBUG)
-
-    # Logging to cloudwatch
-    # if logger_env != "LOCAL":
-    #   log_group = logger_env + "_Backend_Apis"
-    #   cwh = watchtower.CloudWatchLogHandler(log_group = log_group)
-    #   logger.addHandler(cwh)
-    
-    # Email 
-    # if logger_env == "PROD":
-    #   eh = SMTPHandler(self._host, self._from_address, self._to_address, "# Backend Error #", (self._username, self._password), (), timeout=1.0)
-    #   eh.setLevel(logging.ERROR)
-    #   eh.setFormatter(formatter)
-    #   logger.addHandler(eh)
-    
-    # Errors on Slack
-    # if logger_env == "PROD":
-    #   try:
-    #     sh = SlackerLogHandler(self._channel_token, self._channel_name, stack_trace=True)
-    #     sh.setLevel(logging.ERROR)
-    #     sh.setFormatter(formatter)
-    #     logger.addHandler(sh)
-    #   except Exception as e:
-    #     print(e)
-    #     raise e
 
     # Printing in terminal
     consoleHandler = logging.StreamHandler()
