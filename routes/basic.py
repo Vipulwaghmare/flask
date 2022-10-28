@@ -1,4 +1,4 @@
-from flask import Blueprint, request 
+from flask import Blueprint, request , jsonify
 # Request:
 # .method => to get method
 # .json => to get request data 
@@ -28,7 +28,7 @@ def postRequest():
   # return { "success" : "This is default 200" }
   # raise Exception("HI")
   # return {"error": "This is throwing some error"}, 400
-  return [1,2,3,4,5] 
+  return jsonify([1,2,3,4,5])
 
 @basicRoutes.route("/put-request", methods=['PUT'])
 def putRequest():
