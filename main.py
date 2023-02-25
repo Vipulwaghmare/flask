@@ -11,6 +11,7 @@ from model.Logger import Logger
 logger = Logger.get_instance() 
 
 app = Flask(__name__)
+#  test comment
 
 # secret key and type to use session
 app.config['SESSION_TYPE'] = 'filesystem'

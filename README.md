@@ -17,7 +17,7 @@ pip3 install -r requirements.txt
 
 #### To run app
 
-Run app by
+Run app by 
 python main.py
 
 #### To stop
